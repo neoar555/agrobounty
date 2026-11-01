@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroBounty - Mi Cuenta</title>
+    <!-- SDK oficial de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="min-height: 100vh; padding-bottom: 5rem;">
+
+    <!-- Header superior -->
+    <header class="header-app">
+        <div class="header-content">
+            <div>
+                <h1 style="font-size: 1.125rem; font-weight: 700;">🌱 AgroBounty</h1>
+                <p class="text-xs" style="color: #bbf7d0;">Mi Perfil</p>
+            </div>
+            <button onclick="abrirNotificaciones()" class="btn-sm-green" style="background-color: #166534; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+                🔔 <span style="background-color: #ef4444; color: #ffffff; font-size: 10px; padding: 0.1rem 0.35rem; border-radius: 9999px;">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido Principal (Mi Cuenta) -->
+    <main class="main-dashboard space-y-4" style="padding-top: 1rem;">
+        
+        <div class="form-card text-center" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+            
+            <!-- Avatar dinámico -->
+            <div id="avatarLetra" style="width: 5rem; height: 5rem; background-color: #dcfce7; color: #15803d; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 1.875rem; margin: 0 auto; font-weight: 700;">
+                U
+            </div>
+            
+            <div>
+                <h2 id="lblNombrePerfil" style="font-size: 1.125rem; font-weight: 700; color: #1e293b;">Cargando...</h2>
+                <p id="lblCorreoPerfil" class="text-xs" style="color: #64748b;">cargando@ejemplo.com</p>
+            </div>
+
+            <!-- Formulario para Editar Perfil -->
+            <div style="padding-top: 1rem; border-top: 1px solid #f1f5f9; text-align: left;" class="space-y-4">
+                <h3 class="text-xs font-bold" style="color: #334155; text-transform: uppercase; letter-spacing: 0.05em;">Editar Información</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" id="editNombre" class="input-field" placeholder="Tu nombre">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" id="editCorreo" class="input-field" placeholder="tu@correo.com">
+                </div>
+
+                <button onclick="guardarCambiosPerfil()" class="btn-green" style="padding: 0.625rem;">
+                    💾 Guardar Cambios
+                </button>
+            </div>
+
+            <!-- Acciones de Cuenta -->
+            <div style="padding-top: 1rem; border-top: 1px solid #f1f5f9;" class="space-y-4">
+                <button onclick="cerrarSesion()" class="btn-amber">
+                    🚪 Cerrar Sesión
+                </button>
+                <button onclick="eliminarCuenta()" class="btn-danger">
+                    ⚠️ Eliminar Cuenta Permanentemente
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Barra de Navegación Inferior Fija -->
+    <nav class="nav-bottom">
+        <div class="nav-content">
+            <a href="dashboard.html" class="nav-item">
+                🏠 <span>Inicio</span>
+            </a>
+            <a href="publicar.html" class="nav-item">
+                ➕ <span>Publicar</span>
+            </a>
+            <a href="cuenta.html" class="nav-item active">
+                👤 <span>Mi Cuenta</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Modal Notificaciones -->
+    <div id="modalNotif" class="modal-overlay hidden">
+        <div class="modal-content text-center">
+            <h3 class="font-bold text-sm" style="color: #1e293b;">🔔 Notificaciones</h3>
+            <p class="text-xs" style="color: #64748b;">No hay notificaciones nuevas por el momento.</p>
+            <button onclick="cerrarNotificaciones()" class="btn-green text-xs" style="padding: 0.5rem;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Script de Mi Cuenta -->
+    <script>
+        const SUPABASE_URL = 'https://nxriaxzzvcrmzxxqghfl.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_Osb-UqwMymk_dnqNehpigw_kDuiDXhh'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const miUsuarioId = localStorage.getItem('usuarioId');
+        let nombreActual = localStorage.getItem('usuarioAgroBounty') || 'Noé Armenta';
+        let correoActual = localStorage.getItem('correoAgroBounty') || 'noe@agrobounty.com';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!miUsuarioId && !nombreActual) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Intentar cargar la info fresca desde Supabase si tenemos el ID
+            if (miUsuarioId) {
+                const { data: user } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', miUsuarioId)
+                    .maybeSingle();
+
+                if (user) {
+                    nombreActual = user.nombre || nombreActual;
+                    correoActual = user.correo || correoActual;
+                    localStorage.setItem('usuarioAgroBounty', nombreActual);
+                    localStorage.setItem('correoAgroBounty', correoActual);
+                }
+            }
+
+            // Renderizar datos en pantalla
+            actualizarUI();
+        });
+
+        function actualizarUI() {
+            document.getElementById('lblNombrePerfil').textContent = nombreActual;
+            document.getElementById('lblCorreoPerfil').textContent = correoActual;
+            document.getElementById('avatarLetra').textContent = nombreActual.charAt(0).toUpperCase();
+            
+            document.getElementById('editNombre').value = nombreActual;
+            document.getElementById('editCorreo').value = correoActual;
+        }
+
+        async function guardarCambiosPerfil() {
+            const nuevoNombre = document.getElementById('editNombre').value.trim();
+            const nuevoCorreo = document.getElementById('editCorreo').value.trim();
+
+            if (!nuevoNombre || !nuevoCorreo) {
+                alert('Por favor completa tu nombre y correo.');
+                return;
+            }
+
+            try {
+                if (miUsuarioId) {
+                    const { error } = await supabaseClient
+                        .from('usuarios')
+                        .update({ nombre: nuevoNombre, correo: nuevoCorreo })
+                        .eq('id', miUsuarioId);
+
+                    if (error) throw error;
+                }
+
+                // Guardar en local
+                localStorage.setItem('usuarioAgroBounty', nuevoNombre);
+                localStorage.setItem('correoAgroBounty', nuevoCorreo);
+                
+                nombreActual = nuevoNombre;
+                correoActual = nuevoCorreo;
+                actualizarUI();
+
+                alert('¡Perfil actualizado con éxito!');
+            } catch (err) {
+                console.error('Error al actualizar:', err);
+                alert('Ocurrió un error al guardar los cambios.');
+            }
+        }
+
+        function abrirNotificaciones() { document.getElementById('modalNotif').classList.remove('hidden'); }
+        function cerrarNotificaciones() { document.getElementById('modalNotif').classList.add('hidden'); }
+
+        function cerrarSesion() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                localStorage.clear();
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function eliminarCuenta() {
+            if (confirm('¿Estás seguro de eliminar tu cuenta permanentemente?')) {
+                if (miUsuarioId) {
+                    await supabaseClient.from('usuarios').delete().eq('id', miUsuarioId);
+                }
+                localStorage.clear();
+                alert('Cuenta eliminada.');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

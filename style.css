@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* --- 1. BASE Y RESET --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f1f5f9; /* slate-100 */
+    color: #1e293b; /* slate-800 */
+    min-height: 100vh;
+}
+
+/* --- 2. ESTRUCTURA Y CONTENEDORES --- */
+.auth-container {
+    width: 100%;
+    max-width: 24rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.main-dashboard {
+    max-width: 28rem;
+    margin: 0 auto;
+    padding: 1rem;
+    padding-bottom: 5rem;
+}
+
+.form-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* --- 3. HEADER Y NAVEGACIÓN --- */
+.header-app {
+    background-color: #15803d; /* green-700 */
+    color: #ffffff;
+    padding: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-content {
+    max-width: 28rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.nav-content {
+    max-width: 28rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.nav-item {
+    color: #64748b;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: #15803d;
+    font-weight: 700;
+}
+
+.nav-item:hover {
+    color: #15803d;
+}
+
+/* --- 4. FORMULARIOS E INPUTS --- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.85rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569; /* slate-600 */
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.625rem;
+    border: 1px solid #cbd5e1; /* slate-300 */
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-field:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+}
+
+/* --- 5. BOTONES Y ACCIONES --- */
+.btn-green {
+    width: 100%;
+    background-color: #16a34a;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-green:hover {
+    background-color: #15803d;
+}
+
+.btn-sm-green {
+    background-color: #16a34a;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+.btn-sm-green:hover {
+    background-color: #15803d;
+}
+
+.btn-amber {
+    background-color: #f59e0b;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    width: 100%;
+}
+
+.btn-amber:hover {
+    background-color: #d97706;
+}
+
+.btn-danger {
+    background-color: #dc2626;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    width: 100%;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+.btn-link {
+    background: transparent;
+    border: none;
+    color: #15803d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* --- 6. TARJETAS DE LOTES --- */
+.lote-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.lote-img {
+    width: 100%;
+    height: 9rem;
+    object-fit: cover;
+}
+
+.lote-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.badge-time {
+    background-color: #fef3c7; /* amber-100 */
+    color: #92400e; /* amber-800 */
+    font-size: 0.75rem;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+.badge-disabled {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    cursor: not-allowed;
+    display: inline-block;
+    text-align: center;
+}
+
+/* --- 7. MODALES --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 50;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    max-width: 20rem;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+/* --- 8. UTILIDADES --- */
+.hidden {
+    display: none !important;
+}
+
+.text-center { text-align: center; }
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.font-bold { font-weight: 700; }
+.space-y-4 > * + * { margin-top: 1rem; }
