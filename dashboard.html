@@ -54,7 +54,6 @@
             <a href="publicar.html" class="nav-item">
                 ➕ <span>Publicar</span>
             </a>
-            <!-- Enlace corregido para abrir la nueva vista cuenta.html -->
             <a href="cuenta.html" class="nav-item">
                 👤 <span>Mi Cuenta</span>
             </a>
@@ -78,13 +77,14 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_Osb-UqwMymk_dnqNehpigw_kDuiDXhh'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Imagen de respaldo por si algún lote antiguo no tiene foto
         function obtenerImagenProducto(nombre) {
             const n = (nombre || '').toLowerCase();
             if (n.includes('maíz') || n.includes('maiz')) return 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=500&q=80';
             if (n.includes('tomate') || n.includes('jitomate')) return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=500&q=80';
             if (n.includes('trigo')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&q=80';
             if (n.includes('aguacate')) return 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=500&q=80';
-            return 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&q=80';
+            // return 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&q=80';
         }
 
         function calcularTiempoRestante(fechaExpiracionStr) {
@@ -161,11 +161,19 @@
                         `;
                     }
 
+                    // Validar unidad de medida (Kg o Ton)
+                    const unidadMedida = lote.unidadMedida || 'Ton';
+                    const etiquetaUnidad = unidadMedida === 'Kg' ? 'kg' : 't';
+                    const etiquetaPrecio = unidadMedida === 'Kg' ? 'MXN/kg' : 'MXN/t';
+
+                    // Usar la foto real subida a Supabase, o la de respaldo si no existe
+                    const fotoAMostrar = lote.foto_url || obtenerImagenProducto(lote.tipoProducto);
+
                     const card = document.createElement('div');
                     card.className = 'lote-card';
                     
                     card.innerHTML = `
-                        <img src="${obtenerImagenProducto(lote.tipoProducto)}" alt="${lote.tipoProducto}" class="lote-img">
+                        <img src="${fotoAMostrar}" alt="${lote.tipoProducto}" class="lote-img">
                         <div class="lote-body">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                 <div>
@@ -177,11 +185,11 @@
                                     ${calcularTiempoRestante(lote.fechaExpiracion)}
                                 </span>
                             </div>
-                            <p class="text-xs" style="color: #475569; margin: 0;">⚖️ <strong>Cantidad:</strong> ${lote.pesoKg} t</p>
+                            <p class="text-xs" style="color: #475569; margin: 0;">⚖️ <strong>Cantidad:</strong> ${lote.pesoKg} ${etiquetaUnidad}</p>
                             <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.5rem; border-top: 1px solid #f1f5f9;">
                                 <div>
                                     <span class="text-xs" style="color: #94a3b8; display: block;">Precio base</span>
-                                    <span style="font-weight: 800; color: #15803d; font-size: 0.875rem;">$${lote.precioBase.toLocaleString()} MXN/t</span>
+                                    <span style="font-weight: 800; color: #15803d; font-size: 0.875rem;">$${lote.precioBase.toLocaleString()} ${etiquetaPrecio}</span>
                                 </div>
                                 ${accionBotonHTML}
                             </div>

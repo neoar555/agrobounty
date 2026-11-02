@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="display: flex; align-items: center; justify-content: center; padding: 1rem;">
+<body style="display: flex; align-items: center; justify-content: center; padding: 1rem; height: 100vh; overflow: hidden; margin: 0;">
 
     <div class="auth-container">
         
@@ -29,7 +29,10 @@
 
             <div class="form-group">
                 <label class="form-label">Contraseña / PIN</label>
-                <input type="password" id="loginPassword" required class="input-field" placeholder="••••••••">
+                <div class="password-container">
+                    <input type="password" id="loginPassword" required class="input-field" placeholder="••••••••">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword', this)" title="Mostrar/Ocultar contraseña">👁️</button>
+                </div>
             </div>
 
             <button type="submit" class="btn-green" style="margin-top: 0.5rem;">
@@ -57,9 +60,18 @@
                 <input type="email" id="regEmail" required class="input-field" placeholder="correo@ejemplo.com">
             </div>
 
+            <!-- NUEVO CAMPO DE TELÉFONO -->
+            <div class="form-group">
+                <label class="form-label">Teléfono de contacto</label>
+                <input type="tel" id="regPhone" required class="input-field" placeholder="Ej. 4691234567">
+            </div>
+
             <div class="form-group">
                 <label class="form-label">Contraseña / PIN</label>
-                <input type="password" id="regPassword" required class="input-field" placeholder="••••••••">
+                <div class="password-container">
+                    <input type="password" id="regPassword" required class="input-field" placeholder="••••••••">
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('regPassword', this)" title="Mostrar/Ocultar contraseña">👁️</button>
+                </div>
             </div>
 
             <button type="submit" class="btn-green" style="margin-top: 0.5rem;">
@@ -84,6 +96,18 @@
 
     <!-- Script de Supabase y Control de Auth -->
     <script>
+        // Función global para alternar la visibilidad de la contraseña
+        function togglePasswordVisibility(fieldId, btn) {
+            const inputField = document.getElementById(fieldId);
+            if (inputField.type === 'password') {
+                inputField.type = 'text';
+                btn.textContent = '👁️‍🗨️'; // Cambia el icono para indicar que está visible
+            } else {
+                inputField.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
         const SUPABASE_URL = 'https://nxriaxzzvcrmzxxqghfl.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_Osb-UqwMymk_dnqNehpigw_kDuiDXhh'; 
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -134,12 +158,20 @@
                 e.preventDefault();
                 const nombre = document.getElementById('regNombre').value.trim();
                 const correo = document.getElementById('regEmail').value.trim();
+                const telefono = document.getElementById('regPhone').value.trim(); // <-- Obtenemos el teléfono
                 const password = document.getElementById('regPassword').value.trim();
 
                 try {
                     const { data, error } = await supabaseClient
                         .from('usuarios')
-                        .insert([{ correo: correo, pin_acceso: password, nombre: nombre }])
+                        .insert([
+                            { 
+                                correo: correo, 
+                                pin_acceso: password, 
+                                nombre: nombre, 
+                                phone: telefono // <-- Lo guardamos en tu columna 'phone'
+                            }
+                        ])
                         .select();
 
                     if (error) {
