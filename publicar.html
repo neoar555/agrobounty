@@ -73,7 +73,7 @@
 
             <!-- Botón que activa el Modal de Pago -->
             <button type="button" id="btnAbrirModal" class="btn-green" style="padding: 0.75rem;">
-                Continuar a Publicación ($150 MXN)
+                Publicar
             </button>
         </form>
     </main>
@@ -104,193 +104,27 @@
 
             <div class="form-card" style="background-color: #f8fafc; padding: 0.75rem; font-size: 0.75rem;" class="space-y-4">
                 <p style="color: #64748b;">Concepto: Microtransacción por lote</p>
-                <p class="font-bold text-sm" style="color: #1e293b; margin-top: 0.25rem;">Monto a pagar: $150.00 MXN ($1.00 USD)</p>
+                <p class="font-bold text-sm" style="color: #1e293b; margin-top: 0.25rem;">Monto a pagar: $80.00 MXN</p>
             </div>
 
             <div class="space-y-4">
-                <label class="form-label">Elige método de pago (Sandbox)</label>
+                <label class="form-label">Elige método de pago</label>
                 <div style="display: flex; align-items: center; gap: 0.5rem; border: 1px solid #22c55e; padding: 0.625rem; border-radius: 0.5rem; font-size: 0.75rem; background-color: #f0fdf4; color: #166534; font-weight: 500;">
                     <input type="radio" name="pago" checked style="accent-color: #16a34a;">
-                    <span>Tarjeta de Crédito / Débito (Simulador)</span>
+                    <span>Tarjeta de Crédito / Débito (SIMULADA)</span>
+                    <p>Visa •••7708</p>
                 </div>
             </div>
 
             <button type="button" id="btnPagarYPublicar" class="btn-green" style="padding: 0.75rem; background-color: #059669;">
-                Pagar $150 MXN y Activar Lote
+                Pagar $80 MXN y Activar Lote
             </button>
         </div>
     </div>
 
-    <!-- Script completo: Sube foto a Storage + Inserta en Supabase -->
-    <script>
-        const SUPABASE_URL = 'https://nxriaxzzvcrmzxxqghfl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_Osb-UqwMymk_dnqNehpigw_kDuiDXhh'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        function actualizarEtiquetaPrecio() {
-            const unidad = document.getElementById('unidadMedida').value;
-            const labelPrecio = document.getElementById('labelPrecioBase');
-            if (unidad === 'Ton') {
-                labelPrecio.textContent = "Precio base por Tonelada (MXN)";
-            } else {
-                labelPrecio.textContent = "Precio base por Kilogramo (MXN)";
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const usuarioId = localStorage.getItem('usuarioId');
-            const nombreProductor = localStorage.getItem('usuarioAgroBounty');
-
-            if (!usuarioId && !nombreProductor) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            // GPS
-            const gpsStatus = document.getElementById('gpsStatus');
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    async (position) => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        
-                        gpsStatus.textContent = "Obteniendo ubicación exacta de la parcela...";
-
-                        try {
-                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1`, {
-                                headers: { 'Accept-Language': 'es' }
-                            });
-                            const data = await response.json();
-                            
-                            if (data && data.address) {
-                                const addr = data.address;
-                                const localidad = addr.village || addr.localidad || addr.town || addr.hamlet || addr.suburb || addr.city || "";
-                                const municipio = addr.municipality || addr.county || addr.city || "";
-                                const estado = addr.state || "";
-                                
-                                let ubicacionTexto = "";
-                                if (localidad && municipio && localidad !== municipio) {
-                                    ubicacionTexto = `${localidad}, ${municipio}, ${estado}`;
-                                } else if (municipio) {
-                                    ubicacionTexto = `${municipio}, ${estado}`;
-                                } else {
-                                    ubicacionTexto = `${localidad || 'Zona rural'}, ${estado}`;
-                                }
-
-                                gpsStatus.innerHTML = `📍 <b>${ubicacionTexto}</b><br><span style="font-size: 10px; color: #94a3b8;">Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</span>`;
-                                gpsStatus.style.color = '#16a34a';
-                                gpsStatus.style.fontWeight = '600';
-                            } else {
-                                gpsStatus.textContent = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)} (GPS Activo)`;
-                                gpsStatus.style.color = '#16a34a';
-                                gpsStatus.style.fontWeight = '600';
-                            }
-                        } catch (error) {
-                            gpsStatus.textContent = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)} (GPS Activo)`;
-                            gpsStatus.style.color = '#16a34a';
-                            gpsStatus.style.fontWeight = '600';
-                        }
-                    },
-                    (error) => {
-                        gpsStatus.textContent = '⚠️ Error: Activa el GPS para validar tu parcela.';
-                        gpsStatus.style.color = '#ef4444';
-                    },
-                    { enableHighAccuracy: true }
-                );
-            } else {
-                gpsStatus.textContent = 'Tu dispositivo no soporta geolocalización.';
-            }
-
-            const btnAbrirModal = document.getElementById('btnAbrirModal');
-            const modalPago = document.getElementById('modalPago');
-            const cerrarModal = document.getElementById('cerrarModal');
-            const btnPagarYPublicar = document.getElementById('btnPagarYPublicar');
-
-            btnAbrirModal.addEventListener('click', () => {
-                const tipo = document.getElementById('tipoProducto').value.trim();
-                const peso = document.getElementById('pesoKilos').value.trim();
-                const precio = document.getElementById('precioBase').value.trim();
-                const expiracion = document.getElementById('fechaExpiracion').value;
-                const foto = document.getElementById('fotoLote').files.length;
-
-                if(!tipo || !peso || !precio || !expiracion || foto === 0) {
-                    alert('Por favor completa todos los campos del formulario y adjunta la foto del lote.');
-                    return;
-                }
-                modalPago.classList.remove('hidden');
-            });
-
-            cerrarModal.addEventListener('click', () => {
-                modalPago.classList.add('hidden');
-            });
-
-            // Al pagar, subimos la foto a Storage y guardamos el registro completo en la base de datos
-            btnPagarYPublicar.addEventListener('click', async () => {
-                btnPagarYPublicar.textContent = "Subiendo foto y guardando...";
-
-                const tipo = document.getElementById('tipoProducto').value.trim();
-                const pesoValor = parseFloat(document.getElementById('pesoKilos').value);
-                const unidad = document.getElementById('unidadMedida').value;
-                const precio = parseFloat(document.getElementById('precioBase').value);
-                const expiracion = document.getElementById('fechaExpiracion').value;
-                const gps = document.getElementById('gpsStatus').textContent;
-                const archivoFoto = document.getElementById('fotoLote').files[0];
-
-                try {
-                    let urlFotoFinal = 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&q=80'; // Resguardo por si acaso
-
-                    if (archivoFoto) {
-                        const nombreArchivo = `lote_${Date.now()}_${Math.random().toString(36).substring(2)}.jpg`;
-                        
-                        // Subir la imagen al bucket 'fotos-lotes'
-                        const { error: uploadError } = await supabaseClient.storage
-                            .from('fotos-lotes')
-                            .upload(nombreArchivo, archivoFoto);
-
-                        if (uploadError) {
-                            console.error("Error al subir imagen al Storage:", uploadError);
-                        } else {
-                            // Obtener la URL pública de la imagen
-                            const { data: urlData } = supabaseClient.storage
-                                .from('fotos-lotes')
-                                .getPublicUrl(nombreArchivo);
-                                
-                            if (urlData && urlData.publicUrl) {
-                                urlFotoFinal = urlData.publicUrl;
-                            }
-                        }
-                    }
-
-                    // Insertar en la tabla con la URL de la foto real
-                    const { error } = await supabaseClient
-                        .from('lotes_alimentos')
-                        .insert([
-                            { 
-                                tipoProducto: tipo, 
-                                pesoKg: pesoValor, 
-                                unidadMedida: unidad, 
-                                precioBase: precio, 
-                                fechaExpiracion: expiracion, 
-                                coordenadasGPS: gps,
-                                foto_url: urlFotoFinal, // Guardamos la foto real
-                                estadoLote: 'Publicado',
-                                usuario_id: usuarioId,
-                                nombre_productor: nombreProductor
-                            }
-                        ]);
-
-                    if (error) throw error;
-
-                    alert('¡Pago aprobado y lote registrado con foto real en la nube!');
-                    window.location.href = 'dashboard.html';
-
-                } catch (err) {
-                    console.error('Error general:', err);
-                    alert('Hubo un error al registrar el lote.');
-                    btnPagarYPublicar.textContent = "Pagar $150 MXN y Activar Lote";
-                }
-            });
-        });
-    </script>
+    <!-- Scripts externos -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="publicar.js"></script>
 </body>
 </html>

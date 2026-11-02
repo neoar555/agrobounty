@@ -10,8 +10,12 @@
 body {
     font-family: 'Inter', sans-serif;
     background-color: #f1f5f9; /* slate-100 */
+    align-items: center;
+    justify-content: center;
     color: #1e293b; /* slate-800 */
     min-height: 100vh;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 /* --- 2. ESTRUCTURA Y CONTENEDORES --- */
@@ -320,6 +324,36 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 .toggle-password:hover {
     color: #15803d;
+}
+
+body.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
+    
+    /* Fondo degradado moderno en tonos suaves */
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    
+    /* Estilo de tarjeta flotante mejorado */
+    background: rgba(255, 255, 255, 0.95); /* Ligeramente traslúcido */
+    backdrop-filter: blur(10px);          /* Efecto difuminado detrás */
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(21, 128, 61, 0.15); /* Sombra suave con un toque verdoso */
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }

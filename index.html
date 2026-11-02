@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="display: flex; align-items: center; justify-content: center; padding: 1rem; height: 100vh; overflow: hidden; margin: 0;">
+<body class="auth-page" style="display: flex; align-items: center; justify-content: center; padding: 1rem; height: 100vh; overflow: hidden; margin: 0;">
 
     <div class="auth-container">
         
@@ -30,7 +30,7 @@
             <div class="form-group">
                 <label class="form-label">Contraseña / PIN</label>
                 <div class="password-container">
-                    <input type="password" id="loginPassword" required class="input-field" placeholder="••••••••">
+                    <input type="password" id="loginPassword" required class="input-field" placeholder="Contraseña">
                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword', this)" title="Mostrar/Ocultar contraseña">👁️</button>
                 </div>
             </div>
@@ -52,7 +52,7 @@
             
             <div class="form-group">
                 <label class="form-label">Nombre completo o del negocio</label>
-                <input type="text" id="regNombre" required class="input-field" placeholder="Ej. Finca El Juncal">
+                <input type="text" id="regNombre" required class="input-field" placeholder="Ej. Finca El Juruy">
             </div>
 
             <div class="form-group">
@@ -60,16 +60,16 @@
                 <input type="email" id="regEmail" required class="input-field" placeholder="correo@ejemplo.com">
             </div>
 
-            <!-- NUEVO CAMPO DE TELÉFONO -->
+            <!-- CAMPO DE TELÉFONO -->
             <div class="form-group">
                 <label class="form-label">Teléfono de contacto</label>
-                <input type="tel" id="regPhone" required class="input-field" placeholder="Ej. 4691234567">
+                <input type="tel" id="regPhone" required class="input-field" placeholder="Ej. 1234567890">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Contraseña / PIN</label>
                 <div class="password-container">
-                    <input type="password" id="regPassword" required class="input-field" placeholder="••••••••">
+                    <input type="password" id="regPassword" required class="input-field" placeholder="Mínimo 4 caracteres">
                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility('regPassword', this)" title="Mostrar/Ocultar contraseña">👁️</button>
                 </div>
             </div>
@@ -94,100 +94,9 @@
 
     </div>
 
-    <!-- Script de Supabase y Control de Auth -->
-    <script>
-        // Función global para alternar la visibilidad de la contraseña
-        function togglePasswordVisibility(fieldId, btn) {
-            const inputField = document.getElementById(fieldId);
-            if (inputField.type === 'password') {
-                inputField.type = 'text';
-                btn.textContent = '👁️‍🗨️'; // Cambia el icono para indicar que está visible
-            } else {
-                inputField.type = 'password';
-                btn.textContent = '👁️';
-            }
-        }
-
-        const SUPABASE_URL = 'https://nxriaxzzvcrmzxxqghfl.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_Osb-UqwMymk_dnqNehpigw_kDuiDXhh'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const showRegisterBtn = document.getElementById('showRegister');
-            const showLoginBtn = document.getElementById('showLogin');
-
-            showRegisterBtn.addEventListener('click', () => {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-            });
-
-            showLoginBtn.addEventListener('click', () => {
-                registerForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-            });
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const correo = document.getElementById('loginEmail').value.trim();
-                const password = document.getElementById('loginPassword').value.trim();
-
-                try {
-                    const { data: usuario, error } = await supabaseClient
-                        .from('usuarios')
-                        .select('*')
-                        .eq('correo', correo)
-                        .eq('pin_acceso', password)
-                        .maybeSingle();
-
-                    if (error || !usuario) {
-                        alert('Correo o contraseña incorrectos.');
-                    } else {
-                        localStorage.setItem('usuarioAgroBounty', usuario.nombre || usuario.correo);
-                        localStorage.setItem('correoAgroBounty', usuario.correo);
-                        localStorage.setItem('usuarioId', usuario.id);
-                        window.location.href = 'dashboard.html';
-                    }
-                } catch (err) {
-                    console.error('Error:', err);
-                }
-            });
-
-            registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const nombre = document.getElementById('regNombre').value.trim();
-                const correo = document.getElementById('regEmail').value.trim();
-                const telefono = document.getElementById('regPhone').value.trim(); // <-- Obtenemos el teléfono
-                const password = document.getElementById('regPassword').value.trim();
-
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('usuarios')
-                        .insert([
-                            { 
-                                correo: correo, 
-                                pin_acceso: password, 
-                                nombre: nombre, 
-                                phone: telefono // <-- Lo guardamos en tu columna 'phone'
-                            }
-                        ])
-                        .select();
-
-                    if (error) {
-                        alert('Error al registrar: ' + error.message);
-                    } else {
-                        alert(`¡Cuenta creada con éxito para ${nombre}!`);
-                        localStorage.setItem('usuarioAgroBounty', nombre);
-                        localStorage.setItem('correoAgroBounty', correo);
-                        localStorage.setItem('usuarioId', data[0]?.id || '');
-                        window.location.href = 'dashboard.html';
-                    }
-                } catch (err) {
-                    console.error('Error:', err);
-                }
-            });
-        });
-    </script>
+    <!-- Scripts externos -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
