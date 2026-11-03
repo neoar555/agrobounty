@@ -1,17 +1,64 @@
 // ==========================================
-// SERVICE WORKER BÁSICO - AGROBOUNTY
+// SERVICE WORKER CON CACHÉ BÁSICO - AGROBOUNTY
 // ==========================================
+const CACHE_NAME = 'agrobounty-cache-v1';
+const ASSETS_TO_CACHE = [
+    './index.html',
+    './dashboard.html',
+    './publicar.html',
+    './cuenta.html',
+    './detalle.html',
+    './nosotros.html',
+    './style.css',
+    './main.js',
+    './dashboard.js',
+    './publicar.js',
+    './detalle.js',
+    './icon.png'
+];
+
+// 1. Instalación: Guardar archivos estáticos en caché
 self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(ASSETS_TO_CACHE);
+        })
+    );
     self.skipWaiting();
 });
 
+// 2. Activación: Limpiar cachés antiguas si actualizas la app
 self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
+                    }
+                })
+            );
+        })
+    );
+    self.clients.claim();
 });
 
+// 3. Interceptar peticiones: Priorizar red para Supabase, y usar caché para los archivos de la app
 self.addEventListener('fetch', (event) => {
-    // Permite que las peticiones vayan directo a la red (Supabase, imágenes, etc.)
+    // Si la petición es hacia Supabase o APIs externas, dejamos que viaje normal por la red
+    if (event.request.url.includes('supabase.co') || event.request.url.includes('openstreetmap.org')) {
+        return;
+    }
+
     event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
+        fetch(event.request)
+            .then((response) => {
+                // Si hay internet, actualizamos la caché con la respuesta fresca
+                return response;
+            })
+            .catch(() => {
+                // Si no hay internet, devolvemos la versión guardada en caché
+                return caches.match(event.request);
+            })
     );
 });
