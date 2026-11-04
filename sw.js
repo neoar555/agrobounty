@@ -1,7 +1,7 @@
 // ==========================================
 // SERVICE WORKER CON CACHÉ BÁSICO - AGROBOUNTY
 // ==========================================
-const CACHE_NAME = 'agrobounty-cache-v1';
+const CACHE_NAME = 'agrobounty-cache-v2';
 const ASSETS_TO_CACHE = [
     './index.html',
     './dashboard.html',
@@ -9,12 +9,13 @@ const ASSETS_TO_CACHE = [
     './cuenta.html',
     './detalle.html',
     './nosotros.html',
-    './style.css',
-    './main.js',
-    './dashboard.js',
-    './publicar.js',
-    './detalle.js',
-    './icon.png'
+    './css/style.css',
+    './js/main.js',
+    './js/dashboard.js',
+    './js/publicar.js',
+    './js/detalle.js',
+    './js/auth.js',
+    './assets/icon.jpg'
 ];
 
 // 1. Instalación: Guardar archivos estáticos en caché
