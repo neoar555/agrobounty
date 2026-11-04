@@ -33,10 +33,10 @@ Puedes ver la aplicación funcionando en vivo en el siguiente enlace de GitHub P
 ---
 
 # Características Principales
-Experiencia Nativa (PWA): Instalable en dispositivos móviles, con soporte para pantalla completa y funcionamiento offline muy básico mediante un Service Worker, ya que depende del internet en su totalidad.
-Geolocalización: Integración con la API de OpenStreetMap para ubicar con precisión los ejidos de los lotes agrícolas.
-Autenticación y Base de Datos: Gestión de usuarios y almacenamiento de productos en tiempo real utilizando Supabase.
-Diseño Responsivo: Interfaz moderna y adaptada tanto para dispositivos móviles como de escritorio.
+- **Experiencia Nativa (PWA):** Instalable en dispositivos móviles, con soporte para pantalla completa y funcionamiento offline muy básico mediante un Service Worker, ya que depende del internet en su totalidad.
+- **Geolocalización:** Integración con la API de OpenStreetMap para ubicar con precisión los ejidos de los lotes agrícolas.
+- **Autenticación y Base de Datos:** Gestión de usuarios y almacenamiento de productos en tiempo real utilizando Supabase.
+- **Diseño Responsivo:** Interfaz moderna y adaptada tanto para dispositivos móviles como de escritorio.
 
 ---
 
