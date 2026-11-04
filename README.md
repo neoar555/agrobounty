@@ -32,14 +32,14 @@ PWA: Web App Manifest y Service Worker.
 El proyecto se encuentra organizado bajo buenas prácticas de desarrollo web:
 
 agrobounty/
-|--- assets/         # Iconos e imágenes del sistema
-|--- css/            # Estilos globales (style.css)
-|--- js/             # Scripts modulares (auth, dashboard, detalle, publicar, main)
-|--- index.html      # Página de inicio / Autenticación
-|--- dashboard.html  # Panel principal de subastas
-|--- publicar.html   # Formulario de creación de nuevos lotes
-|--- cuenta.html     # Perfil, gestión de sesión y vista de publicaciones
-|--- detalle.html    # Vista detallada de cada lote
-|--- nosotros.html   # Información del proyecto
-|--- manifest.json   # Configuración de la PWA
-|___ sw.js           # Service Worker para el manejo de caché
+assets/   # Iconos e imágenes del sistema
+css/   # Estilos globales (style.css)
+js/   # Scripts modulares (auth, dashboard, detalle, publicar, main)
+index.html   # Página de inicio / Autenticación
+dashboard.html   # Panel principal de subastas
+publicar.html   # Formulario de creación de nuevos lotes
+cuenta.html   # Perfil, gestión de sesión y vista de publicaciones
+detalle.html   # Vista detallada de cada lote
+nosotros.html   # Información del proyecto
+manifest.json   # Configuración de la PWA
+sw.js   # Service Worker para el manejo de caché
