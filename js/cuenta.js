@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     actualizarUI();
     cargarMisPublicaciones();
+    cargarNotificacionesPerfil();
 
     // Evento para confirmar la eliminación del lote desde el modal
     const btnConfirmarEliminacion = document.getElementById('btnConfirmarEliminacion');
@@ -61,6 +62,90 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// --- PANEL DE NOTIFICACIONES SINCRONIZADO ---
+async function cargarNotificacionesPerfil() {
+    const listaNotif = document.getElementById('listaNotificaciones');
+    const badge = document.getElementById('contadorNotif');
+    if (!listaNotif || !badge) return;
+
+    try {
+        const { data: lotes, error } = await supabaseClient
+            .from('lotes_alimentos')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(15);
+
+        if (error) throw error;
+
+        const lotesRecientes = (lotes || [])
+            .filter(lote => !(lote.usuario_id && lote.usuario_id == miUsuarioId) && !(lote.nombre_productor && lote.nombre_productor === nombreActual))
+            .slice(0, 5);
+
+        if (lotesRecientes.length === 0) {
+            listaNotif.innerHTML = `<p class="text-xs text-center" style="color: #64748b; padding: 1rem 0;">No hay notificaciones nuevas por el momento.</p>`;
+            badge.style.display = 'none';
+            return;
+        }
+
+        const ultimaLectura = parseInt(localStorage.getItem('ultimaLecturaNotif') || '0', 10);
+        let nuevasSinLeer = 0;
+
+        listaNotif.innerHTML = '';
+        lotesRecientes.forEach(lote => {
+            const fechaCreacion = lote.created_at ? new Date(lote.created_at).getTime() : Date.now();
+            const esNueva = fechaCreacion > ultimaLectura;
+            if (esNueva) nuevasSinLeer++;
+
+            const unidad = lote.unidadMedida === 'Kg' ? 'kg' : 't';
+            const item = document.createElement('div');
+            item.style.cssText = `
+                padding: 0.65rem;
+                border-radius: 0.5rem;
+                background-color: ${esNueva ? '#f0fdf4' : '#f8fafc'};
+                border: 1px solid ${esNueva ? '#bbf7d0' : '#e2e8f0'};
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.5rem;
+            `;
+
+            item.innerHTML = `
+                <div>
+                    <p class="text-xs font-bold" style="color: #1e293b; text-transform: capitalize;">🌾 Nueva subasta: ${lote.tipoProducto}</p>
+                    <p class="text-xs" style="color: #475569; margin-top: 0.15rem;">${lote.pesoKg} ${unidad} • Por ${lote.nombre_productor || 'Productor Local'}</p>
+                </div>
+                <a href="detalle.html?id=${lote.id}" class="btn-sm-green" style="padding: 0.35rem 0.5rem; font-size: 11px; white-space: nowrap;">Ver</a>
+            `;
+            listaNotif.appendChild(item);
+        });
+
+        if (nuevasSinLeer > 0) {
+            badge.textContent = nuevasSinLeer;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    } catch (err) {
+        console.error('Error al cargar notificaciones:', err);
+    }
+}
+
+function abrirNotificaciones() { 
+    const modal = document.getElementById('modalNotif');
+    const badge = document.getElementById('contadorNotif');
+    if (modal) modal.classList.remove('hidden'); 
+    if (badge) {
+        badge.style.display = 'none';
+        localStorage.setItem('ultimaLecturaNotif', Date.now().toString());
+    }
+}
+
+function cerrarNotificaciones() { 
+    const modal = document.getElementById('modalNotif');
+    if (modal) modal.classList.add('hidden'); 
+}
+
+// --- GESTIÓN DE PERFIL Y MIS PUBLICACIONES ---
 function actualizarUI() {
     const lblNombre = document.getElementById('lblNombrePerfil');
     const lblCorreo = document.getElementById('lblCorreoPerfil');
@@ -173,16 +258,6 @@ async function guardarCambiosPerfil() {
         console.error('Error al actualizar:', err);
         alert('Ocurrió un error al guardar los cambios.');
     }
-}
-
-function abrirNotificaciones() { 
-    const modal = document.getElementById('modalNotif');
-    if (modal) modal.classList.remove('hidden'); 
-}
-
-function cerrarNotificaciones() { 
-    const modal = document.getElementById('modalNotif');
-    if (modal) modal.classList.add('hidden'); 
 }
 
 function cerrarSesion() {
