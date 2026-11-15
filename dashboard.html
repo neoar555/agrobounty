@@ -7,7 +7,7 @@
     <!-- SDK oficial de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#15803d">
     <link rel="icon" type="image/jpeg" href="./assets/icon.jpg">
 </head>
@@ -22,23 +22,37 @@
             </div>
             <!-- Botón de Notificaciones -->
             <button onclick="abrirNotificaciones()" class="btn-sm-green" style="background-color: #166534; display: flex; align-items: center; gap: 0.25rem; cursor: pointer;">
-                🔔 <span style="background-color: #ef4444; color: #ffffff; font-size: 10px; padding: 0.1rem 0.35rem; border-radius: 9999px;">0</span>
+                🔔 <span id="contadorNotif" style="background-color: #ef4444; color: #ffffff; font-size: 10px; padding: 0.1rem 0.35rem; border-radius: 9999px; display: none;">0</span>
             </button>
         </div>
     </header>
 
     <!-- Contenido Principal: Feed de Subastas -->
     <main class="main-dashboard space-y-4" style="padding-top: 1rem;">
+        <!-- Banner de Instalación PWA (Oculto por defecto) -->
+        <div id="bannerInstalar" class="hidden form-card" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; text-align: center; margin-bottom: 1rem; padding: 1rem;">
+            <p class="text-xs font-bold" style="color: #166534; margin-bottom: 0.5rem;">📲 ¡Instala AgroBounty en tu dispositivo!</p>
+            <p class="text-xs" style="color: #475569; margin-bottom: 0.75rem;">Accede más rápido a las subastas express desde tu pantalla de inicio.</p>
+            <button id="btnEjecutarInstalacion" class="btn-green text-xs" style="padding: 0.5rem 1rem;">
+                Instalar Aplicación Ahora
+            </button>
+        </div>
         
         <!-- Barra de búsqueda rápida -->
-        <div class="form-card" style="padding: 0.75rem;">
-            <input type="text" placeholder="Buscar producto o productor..." style="width: 100%; font-size: 0.875rem; outline: none; padding: 0 0.5rem; color: #334155; border: none; background: transparent;">
+        <div class="form-card" style="padding: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 0.875rem;">🔍</span>
+            <input type="text" id="inputBusqueda" oninput="filtrarLotes()" placeholder="Buscar producto o productor..." style="width: 100%; font-size: 0.875rem; outline: none; padding: 0 0.25rem; color: #334155; border: none; background: transparent;">
+            <button type="button" id="btnLimpiarBusqueda" onclick="limpiarBusqueda()" class="hidden" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 0.875rem; font-weight: bold;">✕</button>
         </div>
 
-        <!-- Título de sección -->
+        <!-- Título de sección y botón de actualización -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="text-sm font-bold" style="color: #334155;">Subastas Disponibles</h2>
-            <span class="text-xs" style="color: #15803d; font-weight: 600;">Cerca de ti</span>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <button type="button" id="btnActualizar" onclick="cargarLotes(true)" class="btn-link" style="text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+                    🔄 Actualizar
+                </button>
+            </div>
         </div>
 
         <!-- Contenedor donde aparecen las cosechas en tiempo real de Supabase -->
@@ -65,12 +79,17 @@
 
     <!-- Modal de Notificaciones -->
     <div id="modalNotif" class="modal-overlay hidden">
-        <div class="modal-content text-center">
-            <h3 class="font-bold text-sm" style="color: #1e293b;">🔔 Notificaciones</h3>
-            <br>
-            <p class="text-xs" style="color: #64748b;">No hay notificaciones nuevas por el momento.</p>
-            <br>
-            <button onclick="cerrarNotificaciones()" class="btn-green text-xs" style="padding: 0.5rem;">
+        <div class="modal-content" style="max-width: 22rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+                <h3 class="font-bold text-sm" style="color: #1e293b;">🔔 Notificaciones</h3>
+                <button type="button" onclick="cerrarNotificaciones()" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 1rem;">✕</button>
+            </div>
+            
+            <div id="listaNotificaciones" style="max-height: 15rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; text-align: left;">
+                <p class="text-xs text-center" style="color: #64748b; padding: 1rem 0;">No hay notificaciones nuevas por el momento.</p>
+            </div>
+
+            <button onclick="cerrarNotificaciones()" class="btn-green text-xs" style="padding: 0.5rem; margin-top: 0.25rem;">
                 Entendido
             </button>
         </div>
